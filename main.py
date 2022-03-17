@@ -14,7 +14,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
+from aiogram.types import ParseMode, InputFile
 from aiogram.utils import executor
 
 # задаем уровень логов
@@ -30,6 +30,10 @@ dp = Dispatcher(bot, storage=storage)
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+but4 = types.KeyboardButton(text='Зарегистрироваться')
+keyboard.add(but4)
+
 
 class Form(StatesGroup):
     name = State()  # Will be represented in storage as 'Form:name'
@@ -38,11 +42,8 @@ class Form(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    but4 = types.KeyboardButton(text='Зарегистрироваться')
-    keyboard.add(but4)
     # id1 = message.from_user.id
-    # username = message.from_user.username
+    username = message.from_user.username
     # db_object.execute(f'SELECT id FROM users WHERE id = {id1}')
     # result = db_object.fetchone()
     #
@@ -50,29 +51,12 @@ async def process_start_command(message: types.Message):
     #     db_object.execute('INSERT INTO users(id, username, name, phone_number) VALUES (%s, %s, %s)',
     #                       (id1, username, 0, 0))
     #     db_connection.commit()
-    await message.reply("Привет!", reply_markup=keyboard)
-    # with open('text.txt') as a:
-    #     b = a.readlines()
-    #     await message.answer(*b)
-    await message.answer('Давно вы не ощущали этого семейного вайба. У НАС ДЛЯ ВАС ХОРОШИЕ НОВОСТИ!'
-                         ' Самая семейная тусовка вернулась в строй💕 '
-                         '@Андрей снова зарядит вас позитивом и энергией в конце недели, как в старые добрые😎'
-                         'Ну и как же без подарочков? Мы подготовили для вас:'
-                         '1. 5 ПРОХОДОК(помните, что это не просто проходка, к ней в подарок идёт'
-                         ' самое крутое настроение и классно проведённое время)'
-                         '2. 5 БУТЫЛОК 🍾'
-                         '3. СТРИЖКА В @франк барбер'
-                         'ОСТАЛЬНЫЕ ПОДАРОЧКИ БУДУТ РАСКРЫТЫ ЧУТОЧКУ ПОЗЖЕ '
-                         'ОБЯЗАТЕЛЬНЫЕ УСЛОВИЯ:'
-                         '1. Быть подписанным на наш телеграмм (ссылка в шапке профиля)'
-                         '2. Отметить в комментариях РАЗНЫХ друзей (количество неограниченно)'
-                         '3. Сделать репост афиши'
-                         'Условия входа: '
-                         '250₽ - с репостом ✅'
-                         '300₽ - без ❌'
-                         'ДАТА: 18 марта'
-                         'ОТКРЫТИЕ: 19:00'
-                         'ЗАВЕДЕНИЕ: LUNA BAR')
+    await message.reply(f"Привет! {username}")
+    with open('text.txt', 'r', encoding='utf-8') as f:
+        texts = f.read()
+        await message.answer(texts)
+    # photo = open('1.jpg', 'rb')
+    await bot.send_photo(message.chat.id, InputFile('1.jpg'))
 
 
 # @dp.message_handler(commands=['referal'])
@@ -114,35 +98,13 @@ async def process_start_command(message: types.Message):
 #     with open('one_use.txt', 'r', encoding='utf-8') as f:
 #         texts = f.read()
 #         await message.answer(texts)
-#
-#
-# @dp.message_handler(Text(equals='ЖЕЛЕЗО'))
-# async def hardware_answer(message: types.Message):
-#     with open('hardware.txt', 'r', encoding='utf-8') as f:
-#         texts = f.read()
-#         await message.answer(texts)
-#
-#
-# @dp.message_handler(Text(equals='ЖИДКОСТИ'))
-# async def liquids(message: types.Message):
-#     keyboard = types.InlineKeyboardMarkup()
-#     keyboard.add(types.InlineKeyboardButton(text="Щелочные", callback_data="liquids_standart"))
-#     keyboard.add(types.InlineKeyboardButton(text="Солевые", callback_data="liquids_standart"))
-#     await message.answer("Выберите какие жидкости вас интересуют", reply_markup=keyboard)
-#
-#
-# @dp.callback_query_handler(text='liquids_standart')
-# async def liq_answer(call: types.CallbackQuery):
-#     with open('liquids_standart.txt', 'r', encoding='utf-8') as f:
-#         texts = f.read()
-#         await call.message.answer(texts)
-#         await call.answer()
 
 
 @dp.message_handler(Text(equals='Зарегистрироваться'))
 async def process_start_command2(message: types.Message):
     await Form.name.set()
-    await message.answer('Введите ваше имя')
+    # await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
+    await message.answer('Введите ваше имя', reply_markup=keyboard)
 
 
 @dp.message_handler(state=Form.name)
