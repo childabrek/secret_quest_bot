@@ -51,12 +51,13 @@ async def process_start_command(message: types.Message):
     #     db_object.execute('INSERT INTO users(id, username, name, phone_number) VALUES (%s, %s, %s)',
     #                       (id1, username, 0, 0))
     #     db_connection.commit()
+
     await message.reply(f"Привет! {username}")
     with open('text.txt', 'r', encoding='utf-8') as f:
         texts = f.read()
-        await message.answer(texts)
+        # await message.answer(texts)
     # photo = open('1.jpg', 'rb')
-    await bot.send_photo(message.chat.id, InputFile('1.jpg'))
+    await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
 
 
 # @dp.message_handler(commands=['referal'])
@@ -104,7 +105,7 @@ async def process_start_command(message: types.Message):
 async def process_start_command2(message: types.Message):
     await Form.name.set()
     # await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
-    await message.answer('Введите ваше имя', reply_markup=keyboard)
+    await message.answer('Введите ваше имя')
 
 
 @dp.message_handler(state=Form.name)
@@ -133,7 +134,8 @@ async def process_number(message: types.Message, state: FSMContext):
                           (id1, username, name, phone))
         print(id1, username, data['name'], data['phone_number'])
         db_connection.commit()
-    await message.reply('Вы зарегистрированы!')
+    await message.reply(f'Вы зарегистрированы! Ваш номер,'
+                        f' который нужно будет предьявить на входе {id1}')
     await state.finish()
 
 
