@@ -103,9 +103,15 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(Text(equals='Зарегистрироваться'))
 async def process_start_command2(message: types.Message):
-    await Form.name.set()
     # await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
-    await message.answer('Введите ваше имя')
+    db_object.execute(f'SELECT id FROM users WHERE id = {message.from_user.id}')
+    result = db_object.fetchone()
+
+    if result:
+        await message.answer(f'Вы уже зарегистрированы ваш код для входа {message.from_user.id}')
+    else:
+        await Form.name.set()
+        await message.answer('Введите ваше имя')
 
 
 @dp.message_handler(state=Form.name)
