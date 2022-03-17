@@ -105,12 +105,15 @@ async def process_start_command(message: types.Message):
 @dp.message_handler(Text(equals='Зарегистрироваться'))
 async def process_start_command2(message: types.Message):
     # Test user for registration yet
-    db_object.execute(f'SELECT telegram_id FROM "users2.0" WHERE telegram_id = {message.from_user.id}')
+
+    db_object.execute(f'SELECT telegram_id FROM users WHERE telegram_id = {message.from_user.id}')
     result = db_object.fetchone()
 
-    db_object.execute(f'SELECT id FROM "users2.0" WHERE telegram_id = {message.from_user.id}')
+    db_object.execute(f'SELECT id FROM users WHERE telegram_id = {message.from_user.id}')
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
-    print(result1)
+    # db_object.execute(f"SELECT CURRVAL(pg_get_serial_sequence('users','id')) AS last_insert_id;")
+    # rez = db_object.fetchone()
+    # print(rez)
     if result:
         await message.answer(f'Вы уже зарегистрированы ваш код для входа {result1}')
     else:
@@ -136,17 +139,17 @@ async def process_number(message: types.Message, state: FSMContext):
 
     id1 = message.from_user.id
     username = message.from_user.username
-    db_object.execute(f'SELECT telegram_id FROM "users2.0" WHERE telegram_id = {id1}')
+    db_object.execute(f'SELECT telegram_id FROM users WHERE telegram_id = {id1}')
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute('INSERT INTO "users2.0"(telegram_id, username, name, phone_number) VALUES (%s, %s, %s, %s)',
+        db_object.execute('INSERT INTO users(telegram_id, username, name, phone_number) VALUES (%s, %s, %s, %s)',
                           (id1, username, name, phone))
         print(id1, username, data['name'], data['phone_number'])
         db_connection.commit()
     # with open('text1.txt', 'r', encoding='utf-8') as f:
     #     texts = f.read()
-    db_object.execute(f'SELECT id FROM "users2.0" WHERE telegram_id = {id1}')
+    db_object.execute(f'SELECT id FROM users WHERE telegram_id = {id1}')
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
     await message.reply(f'Отлично, твой номер: {result1} \n'
                         'Кстати, не забудь подписаться на наш телеграмм аккаунт,'
