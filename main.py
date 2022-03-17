@@ -17,24 +17,28 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode, InputFile
 from aiogram.utils import executor
 
-# задаем уровень логов
+# logs level
 logging.basicConfig(level=logging.INFO)
 DB_URI = 'postgres://ncwiwqltyogxme:db5c56c3e31c54d392efb6ae625f83700777' \
          'c736d5d653f1b61bd09cee685ce1@ec2-176-34-105-15.eu-west-1.compute.amazonaws.com:5432/d8bpubesc766fo'
-# инициализируем бота
+
+# initialization bot
 # TOKEN = your API token
 bot = Bot(token='5295251052:AAG0BkwstG0vN59muiaOIpsUIFHpv-2jIBo')
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+# DB config
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+# Button config
 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 but4 = types.KeyboardButton(text='Зарегистрироваться')
 keyboard.add(but4)
 
 
+# Form registration start place
 class Form(StatesGroup):
     name = State()  # Will be represented in storage as 'Form:name'
     phone_number = State()  # Will be represented in storage as 'Form:age'
@@ -42,7 +46,6 @@ class Form(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    # id1 = message.from_user.id
     username = message.from_user.username
     # db_object.execute(f'SELECT id FROM users WHERE id = {id1}')
     # result = db_object.fetchone()
@@ -55,8 +58,6 @@ async def process_start_command(message: types.Message):
     await message.reply(f"Привет! {username}")
     with open('text.txt', 'r', encoding='utf-8') as f:
         texts = f.read()
-        # await message.answer(texts)
-    # photo = open('1.jpg', 'rb')
     await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
 
 
@@ -103,15 +104,18 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(Text(equals='Зарегистрироваться'))
 async def process_start_command2(message: types.Message):
-    # await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
-    db_object.execute(f'SELECT id FROM users WHERE id = {message.from_user.id}')
+    # Test user for registration yet
+    db_object.execute(f'SELECT telegram_id FROM "users2.0" WHERE telegram_id = {message.from_user.id}')
     result = db_object.fetchone()
 
+    db_object.execute(f'SELECT id FROM "users2.0" WHERE telegram_id = {message.from_user.id}')
+    result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
+    print(result1)
     if result:
-        await message.answer(f'Вы уже зарегистрированы ваш код для входа {message.from_user.id}')
+        await message.answer(f'Вы уже зарегистрированы ваш код для входа {result1}')
     else:
         await Form.name.set()
-        await message.answer('Введите ваше имя')
+        await message.answer('Введите ваше имя и фамилию')
 
 
 @dp.message_handler(state=Form.name)
@@ -132,16 +136,23 @@ async def process_number(message: types.Message, state: FSMContext):
 
     id1 = message.from_user.id
     username = message.from_user.username
-    db_object.execute(f'SELECT id FROM users WHERE id = {id1}')
+    db_object.execute(f'SELECT telegram_id FROM "users2.0" WHERE telegram_id = {id1}')
     result = db_object.fetchone()
 
     if not result:
-        db_object.execute('INSERT INTO users(id, username, name, phone_number) VALUES (%s, %s, %s, %s)',
+        db_object.execute('INSERT INTO "users2.0"(telegram_id, username, name, phone_number) VALUES (%s, %s, %s, %s)',
                           (id1, username, name, phone))
         print(id1, username, data['name'], data['phone_number'])
         db_connection.commit()
-    await message.reply(f'Вы зарегистрированы! Ваш номер,'
-                        f' который нужно будет предьявить на входе {id1}')
+    # with open('text1.txt', 'r', encoding='utf-8') as f:
+    #     texts = f.read()
+    db_object.execute(f'SELECT id FROM "users2.0" WHERE telegram_id = {id1}')
+    result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
+    await message.reply(f'Отлично, твой номер: {result1} \n'
+                        'Кстати, не забудь подписаться на наш телеграмм аккаунт,'
+                        ' там будет вся информация о нашей тусовке: https://t.me/+RgkE9Witvo5kMTc6 😎 \n'
+                        'Увидимся уже в эту пятницу!\n'
+                        'С любовью, KAZANTIP❤')
     await state.finish()
 
 
