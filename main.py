@@ -16,6 +16,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode, InputFile
 from aiogram.utils import executor
+from openpyxl import Workbook
 
 # logs level
 logging.basicConfig(level=logging.INFO)
@@ -32,10 +33,16 @@ dp = Dispatcher(bot, storage=storage)
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
+# EXCEL config
+wb = Workbook()
+# grab the active worksheet
+ws = wb.active
+
 # Button config
 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-but4 = types.KeyboardButton(text='Зарегистрироваться')
-keyboard.add(but4)
+but1 = types.KeyboardButton(text='Зарегистрироваться')
+but2 = types.KeyboardButton(text='1234')
+keyboard.add(but1)
 
 
 # Form registration start place
@@ -55,10 +62,7 @@ async def process_start_command(message: types.Message):
     #                       (id1, username, 0, 0))
     #     db_connection.commit()
 
-    await message.reply(f"Привет! {username}")
-    with open('text.txt', 'r', encoding='utf-8') as f:
-        texts = f.read()
-    await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
+    await message.reply(f"Привет! {username}", reply_markup=keyboard)
 
 
 # @dp.message_handler(commands=['referal'])
@@ -117,21 +121,31 @@ async def process_start_command2(message: types.Message):
     if result:
         await message.answer(f'Вы уже зарегистрированы ваш код для входа {result1}')
     else:
+        with open('text.txt', 'r', encoding='utf-8') as f:
+            texts = f.read()
+        await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
         await Form.name.set()
-        await message.answer('Введите ваше имя и фамилию')
+        markup = types.ReplyKeyboardRemove()
+        return await message.answer('Введите ваше имя и фамилию', reply_markup=markup)
 
 
 @dp.message_handler(state=Form.name)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['name'] = message.text
-
     await Form.next()
     await message.reply("Отлично! теперь ваш номер телефона?")
 
-
 @dp.message_handler(state=Form.phone_number)
 async def process_number(message: types.Message, state: FSMContext):
+    # a = input()
+    #
+    # d = '1234567890-()+'
+    #
+    # for i in a:
+    #     if i not in d:
+    #         await state.reset_state(True)
+
     async with state.proxy() as data:
         data['phone_number'] = message.text
         phone = data['phone_number']
@@ -147,21 +161,34 @@ async def process_number(message: types.Message, state: FSMContext):
                           (id1, username, name, phone))
         print(id1, username, data['name'], data['phone_number'])
         db_connection.commit()
-    # with open('text1.txt', 'r', encoding='utf-8') as f:
-    #     texts = f.read()
+
     db_object.execute(f'SELECT id FROM users WHERE telegram_id = {id1}')
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
-    await message.reply(f'Отлично, твой номер: {result1} \n'
-                        'Кстати, не забудь подписаться на наш телеграмм аккаунт,'
-                        ' там будет вся информация о нашей тусовке: https://t.me/+RgkE9Witvo5kMTc6 😎 \n'
-                        'Увидимся уже в эту пятницу!\n'
-                        'С любовью, KAZANTIP❤')
+
+    await message.reply(f'Отлично, твой номер: {result1}\n '
+                        f'Кстати, не забудь подписаться на наши телеграмм аккаунты, '
+                        f'там будет вся информация о наших тусовках: \n'
+                        f'https://t.me/+RgkE9Witvo5kMTc6\n '
+                        f'https://t.me/taste_party\n '
+                        f'Увидимся уже в эту пятницу!\n '
+                        f'Со стилем, KAZANTIP X TASTE🤍\n')
     await state.finish()
 
 
 @dp.message_handler(commands=['chilldabrek'])
 async def process_start_command1(message: types.Message):
-    await message.reply("Да да он\ntelegram:\n@kerbadllihc\n\nhttps://github.com/childabrek")
+    await message.reply("Да да он\ntelegram:\n@chilldabrek\n\nhttps://github.com/childabrek")
+
+
+@dp.message_handler(Text(equals='excel'))
+async def excel(message: types.Message):
+    db_object.execute(f'SELECT * FROM users')
+    for i in db_object.fetchall():
+        ws.append(i)
+    # Save the file
+    wb.save("sample.xlsx")
+
+    await message.answer_document(open("sample.xlsx", 'rb'))
 
 
 # запускаем лонг поллинг
