@@ -20,8 +20,8 @@ from openpyxl import Workbook
 
 # logs level
 logging.basicConfig(level=logging.INFO)
-DB_URI = 'postgres://ncwiwqltyogxme:db5c56c3e31c54d392efb6ae625f83700777' \
-         'c736d5d653f1b61bd09cee685ce1@ec2-176-34-105-15.eu-west-1.compute.amazonaws.com:5432/d8bpubesc766fo'
+DB_URI = 'postgres://afzlxrjvaklsms:2acd0197ef23a3692c85d7fca7922eeed81046ca1597d9f' \
+         '31cb559b243b9f2e8@ec2-79-125-26-60.eu-west-1.compute.amazonaws.com:5432/ddnqvvcb17288e'
 
 # initialization bot
 # TOKEN = your API token
