@@ -165,14 +165,15 @@ async def process_number(message: types.Message, state: FSMContext):
 
     db_object.execute(f'SELECT id FROM users WHERE telegram_id = {id1}')
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
-
+    markup = types.KeyboardButton(text='/start')
+    keyboard.add(markup)
     await message.reply(f'Отлично, твой номер: {result1}\n '
                         f'Кстати, не забудь подписаться на наши телеграмм аккаунты, '
                         f'там будет вся информация о наших тусовках: \n'
                         f'https://t.me/+RgkE9Witvo5kMTc6\n '
                         f'https://t.me/taste_party\n '
                         f'Увидимся уже в эту пятницу!\n '
-                        f'Со стилем, KAZANTIP X TASTE🤍\n')
+                        f'Со стилем, KAZANTIP X TASTE🤍\n', reply_markup=keyboard)
     await state.finish()
 
 
