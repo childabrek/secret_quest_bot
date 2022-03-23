@@ -17,6 +17,10 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode, InputFile
 from aiogram.utils import executor
 from openpyxl import Workbook
+from aiogram.dispatcher import FSMContext
+from aiogram.types import Message
+import os
+from aiogram_broadcaster import MessageBroadcaster
 
 # logs level
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +65,6 @@ async def process_start_command(message: types.Message):
     #     db_object.execute('INSERT INTO users(id, username, name, phone_number) VALUES (%s, %s, %s)',
     #                       (id1, username, 0, 0))
     #     db_connection.commit()
-
     await message.reply(f"Привет! {username}", reply_markup=keyboard)
 
 
@@ -188,9 +191,18 @@ async def excel(message: types.Message):
     for i in db_object.fetchall():
         ws.append(i)
     # Save the file
+    os.remove(os.path.join('KazantipBot', 'sample.xlsx'))
     wb.save("sample.xlsx")
 
     await message.answer_document(open("sample.xlsx", 'rb'))
+
+
+# @dp.message_handler(commands=['tellall'])
+# async def mailing(message: types.Message):
+#     keyboard.add(types.reply_keyboard.KeyboardButton(text='Зарегистрироваться'))
+#     for i in range(1):
+#         await bot.send_message(chat_id='881012147',
+#                                text="Тестовая рассылка", reply_markup=keyboard)
 
 
 # запускаем лонг поллинг
