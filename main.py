@@ -191,10 +191,9 @@ async def excel(message: types.Message):
     for i in db_object.fetchall():
         ws.append(i)
     # Save the file
-    os.remove(os.path.join('', 'sample.xlsx'))
     wb.save("sample.xlsx")
-
     await message.answer_document(open("sample.xlsx", 'rb'))
+    os.remove('sample.xlsx')
 
 
 # @dp.message_handler(commands=['tellall'])
