@@ -22,8 +22,8 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 # DB config
-db_connection = psycopg2.connect(DB_URI, sslmode='require')
-db_object = db_connection.cursor()
+# db_connection = psycopg2.connect(DB_URI, sslmode='require')
+# db_object = db_connection.cursor()
 
 # EXCEL config
 wb = Workbook()
