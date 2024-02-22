@@ -46,7 +46,8 @@ class Form(StatesGroup):
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     username = message.from_user.username
-    await message.reply(f"Привет! {username}", reply_markup=keyboard)
+    await message.reply(f"Чао, {username}!\n "
+                        f"Состоишь ли ты в нашей семье?", reply_markup=keyboard)
 
 
 # @dp.message_handler(commands=['referal'])
@@ -129,19 +130,8 @@ async def process_number(message: types.Message, state: FSMContext):
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
     markup = types.KeyboardButton(text='/start')
     keyboard.add(markup)
-    await message.reply(f'Отлично, твой номер: {result1}\n '
-                        f'Кстати, не забудь подписаться на наши телеграмм аккаунты, '
-                        f'там будет вся информация о наших тусовках: \n'
-                        f'https://t.me/+RgkE9Witvo5kMTc6\n '
-                        f'https://t.me/taste_party\n '
-                        f'Увидимся уже в эту пятницу!\n '
-                        f'Со стилем, KAZANTIP X TASTE🤍\n', reply_markup=keyboard)
+    await message.reply(f'Отлично, твой номер: {result1}', reply_markup=keyboard)
     await state.finish()
-
-
-@dp.message_handler(commands=['chilldabrek'])
-async def process_start_command1(message: types.Message):
-    await message.reply("Да да он\ntelegram:\n@chilldabrek\n\nhttps://github.com/childabrek")
 
 
 @dp.message_handler(Text(equals='excel'))
