@@ -21,9 +21,14 @@ bot = Bot(token=config.TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-# DB config
+# DB config local
+db_connection = psycopg2.connect(user=config.USER, password=config.PASSWORD,
+                                 host=config.HOST,
+                                 port=config.PORT)
+# DB config with link
 # db_connection = psycopg2.connect(DB_URI, sslmode='require')
-# db_object = db_connection.cursor()
+
+db_object = db_connection.cursor()
 
 # EXCEL config
 wb = Workbook()
