@@ -25,6 +25,7 @@ dp = Dispatcher(bot, storage=storage)
 db_connection = psycopg2.connect(user=config.USER, password=config.PASSWORD,
                                  host=config.HOST,
                                  port=config.PORT)
+
 # DB config with link
 # db_connection = psycopg2.connect(DB_URI, sslmode='require')
 
@@ -53,34 +54,6 @@ async def process_start_command(message: types.Message):
     username = message.from_user.username
     await message.reply(f"Чао, {username}!\n "
                         f"Состоишь ли ты в нашей семье?", reply_markup=keyboard)
-
-
-# @dp.message_handler(commands=['referal'])
-# async def referal_start(message: types.Message):
-#     user_channel_status = await bot.get_chat_member(chat_id=my_channel_id, user_id=message.chat.id)
-#     user_channel_status = re.findall(r"\w*", str(user_channel_status))
-#     try:
-#         if user_channel_status[70] != 'left':
-#             with open('1.png', mode='rb') as f:
-#                 await bot.send_photo(message.from_user.id, f)
-#             await bot.send_message(message.from_user.id, 'ок')
-#
-#         else:
-#             with open('2.png', mode='rb') as f:
-#                 await bot.send_photo(message.from_user.id, f)
-#             await bot.send_message(message.chat.id, 'ne ok')
-#             # Условие для тех, кто не подписан
-#     except:
-#         if user_channel_status[60] != 'left':
-#             with open('1.png', mode='rb') as f:
-#                 await bot.send_photo(message.from_user.id, f)
-#             await bot.send_message(message.from_user.id, 'ok1')
-#             # Условие для "подписанных"
-#         else:
-#             with open('2.png', mode='rb') as f:
-#                 await bot.send_photo(message.from_user.id, f)
-#             await bot.send_message(message.from_user.id, 'ne ok1')
-#             # Условие для тех, кто не подписан
 
 
 @dp.message_handler(Text(equals='Зарегистрироваться'))
@@ -156,6 +129,22 @@ async def excel(message: types.Message):
 #     for i in range(1):
 #         await bot.send_message(chat_id='881012147',
 #                                text="Тестовая рассылка", reply_markup=keyboard)
+
+@dp.message_handler(commands=['referal'])
+async def referal_start(message: types.Message):
+    key = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    b2 = types.KeyboardButton(text='Проверь ещё раз')
+    b3 = types.KeyboardButton(text='Связь)')
+    key.add(b2, b3)
+    # message.chat.id
+    # try:
+    user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
+    print(user_channel_status)
+    with open('photo/screen2.jpg', 'rb') as photo:
+        await message.answer_photo(photo)
+    await process_start_command2(message)
+# except:
+#     await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
 
 
 # запускаем лонг поллинг
