@@ -56,6 +56,23 @@ async def process_start_command(message: types.Message):
                         f"Состоишь ли ты в нашей семье?", reply_markup=keyboard)
 
 
+@dp.message_handler(commands=['referal'])
+async def referal_start(message: types.Message):
+    key = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    b2 = types.KeyboardButton(text='Проверь ещё раз')
+    b3 = types.KeyboardButton(text='Связь)')
+    key.add(b2, b3)
+    # message.chat.id
+    try:
+        user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
+        print(user_channel_status)
+        with open('photo/screen2.jpg', 'rb') as photo:
+            await message.answer_photo(photo)
+        await process_start_command2(message)
+    except:
+        await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
+
+
 @dp.message_handler(Text(equals='Зарегистрироваться'))
 async def process_start_command2(message: types.Message):
     # Test user for registration yet
@@ -129,22 +146,6 @@ async def excel(message: types.Message):
 #     for i in range(1):
 #         await bot.send_message(chat_id='881012147',
 #                                text="Тестовая рассылка", reply_markup=keyboard)
-
-@dp.message_handler(commands=['referal'])
-async def referal_start(message: types.Message):
-    key = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    b2 = types.KeyboardButton(text='Проверь ещё раз')
-    b3 = types.KeyboardButton(text='Связь)')
-    key.add(b2, b3)
-    # message.chat.id
-    # try:
-    user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
-    print(user_channel_status)
-    with open('photo/screen2.jpg', 'rb') as photo:
-        await message.answer_photo(photo)
-    await process_start_command2(message)
-# except:
-#     await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
 
 
 # запускаем лонг поллинг
