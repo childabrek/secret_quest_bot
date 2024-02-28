@@ -24,7 +24,7 @@ dp = Dispatcher(bot, storage=storage)
 # DB config local
 db_connection = psycopg2.connect(user=config.USER, password=config.PASSWORD,
                                  host=config.HOST,
-                                 port=config.PORT)
+                                 port=config.PORT, database=config.DATABASE)
 
 # DB config with link
 # db_connection = psycopg2.connect(DB_URI, sslmode='require')
@@ -63,14 +63,19 @@ async def referal_start(message: types.Message):
     b3 = types.KeyboardButton(text='Связь)')
     key.add(b2, b3)
     # message.chat.id
-    try:
-        user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
-        print(user_channel_status)
-        with open('photo/screen2.jpg', 'rb') as photo:
-            await message.answer_photo(photo)
+    # try:
+    user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
+    print(user_channel_status)
+    with open('photo/screen2.jpg', 'rb') as photo:
+        await message.answer_photo(photo)
         await process_start_command2(message)
-    except:
-        await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
+    # except:
+    await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
+
+
+@dp.message_handler(text='Проверь ещё раз')
+async def referal_start_recheck(message: types.Message):
+    await referal_start(message)
 
 
 @dp.message_handler(Text(equals='Зарегистрироваться'))
@@ -78,7 +83,6 @@ async def process_start_command2(message: types.Message):
     # Test user for registration yet
     db_object.execute(f'SELECT telegram_id FROM users WHERE telegram_id = {message.from_user.id}')
     result = db_object.fetchone()
-
     db_object.execute(f'SELECT id FROM users WHERE telegram_id = {message.from_user.id}')
     result1 = str(db_object.fetchone()).replace(',)', '').replace('(', '')
     # db_object.execute(f"SELECT CURRVAL(pg_get_serial_sequence('users','id')) AS last_insert_id;")
@@ -87,9 +91,9 @@ async def process_start_command2(message: types.Message):
     if result:
         await message.answer(f'Вы уже зарегистрированы ваш код для входа {result1}')
     else:
-        with open('text.txt', 'r', encoding='utf-8') as f:
-            texts = f.read()
-        await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
+        # with open('text.txt', 'r', encoding='utf-8') as f:
+        #     texts = f.read()
+        # await bot.send_photo(message.chat.id, photo=InputFile('1.jpg'), caption=texts, reply_markup=keyboard)
         await Form.name.set()
         markup = types.ReplyKeyboardRemove()
         return await message.answer('Введите ваше имя и фамилию', reply_markup=markup)
