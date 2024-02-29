@@ -63,14 +63,14 @@ async def referal_start(message: types.Message):
     b3 = types.KeyboardButton(text='Связь)')
     key.add(b2, b3)
     # message.chat.id
-    # try:
-    user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
-    print(user_channel_status)
-    with open('photo/screen2.jpg', 'rb') as photo:
-        await message.answer_photo(photo)
-        await process_start_command2(message)
-    # except:
-    await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
+    try:
+        user_channel_status = await bot.get_chat_member(chat_id=-1001994006638, user_id=message.chat.id)
+        print(user_channel_status)
+        with open('photo/screen2.jpg', 'rb') as photo:
+            await message.answer_photo(photo)
+            await process_start_command2(message)
+    except:
+        await message.answer('Пока тебя не примут в семью, мне не о чем с тобой говорить', reply_markup=key)
 
 
 @dp.message_handler(text='Проверь ещё раз')
